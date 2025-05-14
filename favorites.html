@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Favorite Universities</h1>
+
+{% if current_user.is_authenticated %}
+    {% if favorites %}
+        <div class="university-list">
+            {% for university in favorites %}
+            <div class="university-card">
+                <h2><a href="{{ url_for("university_page", university_id=university.id) }}">{{ university.name }}</a></h2>
+                <p><strong>Location:</strong> {{ university.city }}, {{ university.country }}</p>
+                <p><strong>Type:</strong> {{ university.type }}</p>
+                <!-- Add remove from favorites button later -->
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You haven't added any universities to your favorites yet.</p>
+        <p><a href="{{ url_for("search_page") }}">Start searching</a> to find universities to add.</p>
+    {% endif %}
+{% else %}
+    <p>Please <a href="{{ url_for("login_page") }}">login</a> to view your favorite universities.</p>
+{% endif %}
+
+{% endblock %}
+

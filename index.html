@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <h1>Find Your Perfect University</h1>
+    <p>Explore universities in Egypt and the Gulf region. Use our tools to search, compare, and find the best fit for you.</p>
+    <a href="{{ url_for("search_page") }}" class="cta-button">Start Searching</a>
+</section>
+
+<section class="regions">
+    <h2>Explore by Region</h2>
+    <div class="region-links">
+        <a href="{{ url_for("region_page", region_name="Egypt") }}">Egypt</a>
+        <a href="{{ url_for("region_page", region_name="Gulf") }}">Gulf Region</a>
+        <!-- Add more specific country links if needed -->
+    </div>
+</section>
+
+<!-- Add sections for featured universities or other content later -->
+
+{% endblock %}
+

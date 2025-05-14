@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Search Universities</h1>
+
+<form method="GET" action="{{ url_for("search_page") }}">
+    <div class="search-filters">
+        <div class="filter-group">
+            <label for="query">Keywords:</label>
+            <input type="text" id="query" name="query" placeholder="University name, city...">
+        </div>
+        <div class="filter-group">
+            <label for="region">Region:</label>
+            <select id="region" name="region">
+                <option value="">All Regions</option>
+                <option value="Egypt">Egypt</option>
+                <option value="Gulf">Gulf Region</option>
+                <!-- Add more specific countries later if needed -->
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country" placeholder="e.g., Egypt, UAE">
+        </div>
+        <div class="filter-group">
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" placeholder="e.g., Cairo, Dubai">
+        </div>
+        <div class="filter-group">
+            <label for="min_rank">Min Regional Rank:</label>
+            <input type="number" id="min_rank" name="min_rank" min="1">
+        </div>
+        <div class="filter-group">
+            <label for="max_acceptance">Max Acceptance Rate (%):</label>
+            <input type="number" id="max_acceptance" name="max_acceptance" min="0" max="100">
+        </div>
+        <div class="filter-group">
+            <label for="type">Type:</label>
+            <select id="type" name="type">
+                <option value="">All Types</option>
+                <option value="Public">Public</option>
+                <option value="Private">Private</option>
+            </select>
+        </div>
+        <button type="submit">Search</button>
+    </div>
+</form>
+
+<div class="search-results">
+    <h2>Results</h2>
+    {% if results %}
+        <div class="university-list">
+            {% for university in results %}
+            <div class="university-card">
+                <h3><a href="{{ url_for("university_page", university_id=university.id) }}">{{ university.name }}</a></h3>
+                <p>{{ university.city }}, {{ university.country }}</p>
+                <p>Rank: {{ university.regional_rank | default("N/A", True) }} | Acceptance: {{ university.acceptance_rate | default("N/A", True) }}%</p>
+                <!-- Add compare/favorite buttons later -->
+            </div>
+            {% endfor %}
+        </div>
+    {% elif request.args %}
+        <p>No universities found matching your criteria.</p>
+    {% else %}
+        <p>Enter search criteria above to find universities.</p>
+    {% endif %}
+</div>
+
+{% endblock %}
+

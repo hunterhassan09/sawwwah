@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Compare Universities</h1>
+
+<div class="comparison-tool">
+    <form method="GET" action="{{ url_for("compare_page") }}">
+        <div class="selection-area">
+            <div class="selector">
+                <label for="uni1">Select University 1:</label>
+                <select id="uni1" name="uni1">
+                    <option value="">-- Select --</option>
+                    {% for uni in all_universities %}
+                    <option value="{{ uni.id }}" {% if uni1_id == uni.id %}selected{% endif %}>{{ uni.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="selector">
+                <label for="uni2">Select University 2:</label>
+                <select id="uni2" name="uni2">
+                    <option value="">-- Select --</option>
+                    {% for uni in all_universities %}
+                    <option value="{{ uni.id }}" {% if uni2_id == uni.id %}selected{% endif %}>{{ uni.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">Compare</button>
+        </div>
+    </form>
+
+    {% if uni1 and uni2 %}
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>{{ uni1.name }}</th>
+                    <th>{{ uni2.name }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Location</td>
+                    <td>{{ uni1.city }}, {{ uni1.country }}</td>
+                    <td>{{ uni2.city }}, {{ uni2.country }}</td>
+                </tr>
+                <tr>
+                    <td>Type</td>
+                    <td>{{ uni1.type | default("N/A", True) }}</td>
+                    <td>{{ uni2.type | default("N/A", True) }}</td>
+                </tr>
+                <tr>
+                    <td>Founded</td>
+                    <td>{{ uni1.founded_year | default("N/A", True) }}</td>
+                    <td>{{ uni2.founded_year | default("N/A", True) }}</td>
+                </tr>
+                <tr>
+                    <td>Rating</td>
+                    <td>{{ uni1.rating | default("N/A", True) }} ★</td>
+                    <td>{{ uni2.rating | default("N/A", True) }} ★</td>
+                </tr>
+                <tr>
+                    <td>Regional Rank</td>
+                    <td>{{ uni1.regional_rank | default("N/A", True) }}</td>
+                    <td>{{ uni2.regional_rank | default("N/A", True) }}</td>
+                </tr>
+                <tr>
+                    <td>World Rank</td>
+                    <td>{{ uni1.world_rank | default("N/A", True) }}</td>
+                    <td>{{ uni2.world_rank | default("N/A", True) }}</td>
+                </tr>
+                <tr>
+                    <td>Acceptance Rate</td>
+                    <td>{{ uni1.acceptance_rate | default("N/A", True) }}%</td>
+                    <td>{{ uni2.acceptance_rate | default("N/A", True) }}%</td>
+                </tr>
+                <tr>
+                    <td>IGCSE Requirements</td>
+                    <td><pre>{{ uni1.igcse_requirements | default("N/A", True) }}</pre></td>
+                    <td><pre>{{ uni2.igcse_requirements | default("N/A", True) }}</pre></td>
+                </tr>
+                <tr>
+                    <td>Advantages</td>
+                    <td><pre>{{ uni1.advantages | default("N/A", True) }}</pre></td>
+                    <td><pre>{{ uni2.advantages | default("N/A", True) }}</pre></td>
+                </tr>
+                <tr>
+                    <td>Disadvantages</td>
+                    <td><pre>{{ uni1.disadvantages | default("N/A", True) }}</pre></td>
+                    <td><pre>{{ uni2.disadvantages | default("N/A", True) }}</pre></td>
+                </tr>
+                <tr>
+                    <td>Website</td>
+                    <td>{% if uni1.website %}<a href="{{ uni1.website }}" target="_blank">Link</a>{% else %}N/A{% endif %}</td>
+                    <td>{% if uni2.website %}<a href="{{ uni2.website }}" target="_blank">Link</a>{% else %}N/A{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{% if uni1.email %}<a href="mailto:{{ uni1.email }}">{{ uni1.email }}</a>{% else %}N/A{% endif %}</td>
+                    <td>{% if uni2.email %}<a href="mailto:{{ uni2.email }}">{{ uni2.email }}</a>{% else %}N/A{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% elif request.args.get("uni1") or request.args.get("uni2") %}
+        <p>Please select two universities to compare.</p>
+    {% else %}
+        <p>Select two universities using the dropdowns above to see a side-by-side comparison.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

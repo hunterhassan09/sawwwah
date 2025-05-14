@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="university-detail">
+    <h1>{{ university.name }}</h1>
+    <p>
+        {% if university.certified %} <span class="badge certified">Certified</span> {% endif %}
+        <span class="rating">{{ university.rating if university.rating else "N/A" }} ★</span>
+    </p>
+    <p><strong>Location:</strong> {{ university.city }}, {{ university.country }} ({{ university.region }})</p>
+
+    <!-- Add favorite button -->
+    {% if current_user.is_authenticated %}
+        <form action="{{ url_for("toggle_favorite", university_id=university.id) }}" method="POST" style="display: inline;">
+            {% if university in current_user.favorites %}
+                <button type="submit" class="favorite-btn favorited">★ Remove from Favorites</button>
+            {% else %}
+                <button type="submit" class="favorite-btn">☆ Add to Favorites</button>
+            {% endif %}
+        </form>
+    {% endif %}
+
+    <!-- Interactive Map Section -->
+    {% if university.latitude and university.longitude %}
+    <div id="map" style="height: 300px; width: 100%; margin-top: 20px; margin-bottom: 20px;"></div>
+    {% endif %}
+
+    <div class="key-info">
+        <h2>Key Information</h2>
+        <ul>
+            <li><strong>Founded:</strong> {{ university.founded_year if university.founded_year else "N/A" }}</li>
+            <li><strong>Type:</strong> {{ university.type if university.type else "N/A" }}</li>
+            <li><strong>Regional Rank:</strong> {{ university.regional_rank if university.regional_rank else "N/A" }}</li>
+            <li><strong>World Rank:</strong> {{ university.world_rank if university.world_rank else "N/A" }}</li>
+            <li><strong>Acceptance Rate:</strong> {{ university.acceptance_rate if university.acceptance_rate else "N/A" }}%</li>
+        </ul>
+    </div>
+
+    {% if university.igcse_requirements %}
+    <div class="requirements">
+        <h2>IGCSE Admission Requirements</h2>
+        <pre>{{ university.igcse_requirements }}</pre>
+    </div>
+    {% endif %}
+
+    {% if university.advantages %}
+    <div class="advantages">
+        <h2>Advantages</h2>
+        <pre>{{ university.advantages }}</pre>
+    </div>
+    {% endif %}
+
+    {% if university.disadvantages %}
+    <div class="disadvantages">
+        <h2>Disadvantages</h2>
+        <pre>{{ university.disadvantages }}</pre>
+    </div>
+    {% endif %}
+
+    <div class="contact-info">
+        <h2>Contact Information</h2>
+        <p><strong>Website:</strong> {% if university.website %}<a href="{{ university.website }}" target="_blank">{{ university.website }}</a>{% else %}N/A{% endif %}</p>
+        <p><strong>Email:</strong> {% if university.email %}<a href="mailto:{{ university.email }}">{{ university.email }}</a>{% else %}N/A{% endif %}</p>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if university.latitude and university.longitude %}
+<script>
+    var map = L.map("map").setView([{{ university.latitude }}, {{ university.longitude }}], 13); // Set zoom level (e.g., 13)
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
+    }).addTo(map);
+
+    var marker = L.marker([{{ university.latitude }}, {{ university.longitude }}]).addTo(map);
+    marker.bindPopup("<b>{{ university.name }}</b><br>{{ university.city }}, {{ university.country }}").openPopup();
+</script>
+{% endif %}
+{% endblock %}
+

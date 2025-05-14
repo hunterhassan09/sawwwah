@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Universities in {{ region_name }}</h1>
+
+<!-- Add filtering/sorting options here later -->
+
+<div class="university-list">
+    {% for university in universities %}
+    <div class="university-card">
+        <h2><a href="{{ url_for("university_page", university_id=university.id) }}">{{ university.name }}</a></h2>
+        <p><strong>Location:</strong> {{ university.city }}, {{ university.country }}</p>
+        <p><strong>Type:</strong> {{ university.type }}</p>
+        <p><strong>Rating:</strong> {{ university.rating if university.rating else "N/A" }} ★</p>
+        <p><strong>Acceptance Rate:</strong> {{ university.acceptance_rate if university.acceptance_rate else "N/A" }}%</p>
+        <!-- Add more details or a link to the full page -->
+    </div>
+    {% else %}
+    <p>No universities found for this region yet.</p>
+    {% endfor %}
+</div>
+
+<!-- Add pagination if needed -->
+
+{% endblock %}
+

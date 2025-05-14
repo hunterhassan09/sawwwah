@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - University Guide</title>
+    <link rel="stylesheet" href="{{ url_for("static", filename="css/style.css") }}">
+    <!-- Leaflet CSS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <!-- Add any other CSS/JS links here -->
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for("index") }}">Home</a></li>
+                <li><a href="{{ url_for("region_page", region_name="Egypt") }}">Egypt</a></li>
+                <li><a href="{{ url_for("region_page", region_name="Gulf") }}">Gulf Region</a></li>
+                <li><a href="{{ url_for("search_page") }}">Search</a></li>
+                <li><a href="{{ url_for("compare_page") }}">Compare</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for("favorites_page") }}">My Favorites</a></li>
+                    <li><a href="{{ url_for("logout_page") }}">Logout ({{ current_user.username }})</a></li>
+                {% else %}
+                    <li><a href="{{ url_for("login_page") }}">Login</a></li>
+                    <li><a href="{{ url_for("register_page") }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flashes">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}
+        <!-- Page-specific content will go here -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 University Guide. Created by Manus.</p>
+    </footer>
+
+    <!-- Leaflet JS for maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <!-- Add any other JS scripts here -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+

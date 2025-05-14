@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block content %}
+<h1>Login</h1>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for("login_page") }}">
+    {{ form.hidden_tag() }}
+    <dl>
+        {{ render_field(form.email) }}
+        {{ render_field(form.password) }}
+        {{ render_field(form.remember) }}
+    </dl>
+    <p><input type="submit" value="Login"></p>
+</form>
+<p>Don't have an account? <a href="{{ url_for("register_page") }}">Register here</a>.</p>
+{% endblock %}
+
