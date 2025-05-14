@@ -18,10 +18,10 @@ from src.forms import LoginForm, RegistrationForm
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
 app.config["SECRET_KEY"] = os.urandom(24)
 
-# Configure database - Using SQLite for simplicity in development
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "../university_data.db")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# Configure database to use DATABASE_URL from environment variables (for Render PostgreSQL)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+# Remove SQLALCHEMY_TRACK_MODIFICATIONS if it was there, as it's often not needed with modern SQLAlchemy
+# If you had app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False, you can keep it or remove it.
 
 # Initialize extensions
 db.init_app(app)
@@ -35,11 +35,6 @@ login_manager.login_message_category = "info"
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-# Create database tables if they don't exist
-# Moved seeding to a separate script (seed_db.py)
-# with app.app_context():
-#     db.create_all()
 
 # --- Routes --- #
 
@@ -133,28 +128,24 @@ def search_page():
 
     if min_rank_str.isdigit():
         min_rank = int(min_rank_str)
-        # Filter out None values before comparison
         results = results.filter(University.regional_rank != None, University.regional_rank >= min_rank)
 
     if max_acceptance_str.isdigit():
         max_acceptance = int(max_acceptance_str)
-        # Filter out None values before comparison
         results = results.filter(University.acceptance_rate != None, University.acceptance_rate <= max_acceptance)
 
     if uni_type:
         results = results.filter(University.type.ilike(f"%{uni_type}%"))
 
-    # Only execute query if search parameters were provided
     if request.args:
         final_results = results.order_by(University.name).all()
     else:
-        final_results = [] # No search performed yet
+        final_results = []
 
     return render_template("search.html", title="Search Results", results=final_results)
 
 @app.route("/compare")
 def compare_page():
-    # Logic for comparison will be added in step 007
     all_universities = University.query.order_by(University.name).all()
     uni1_id_str = request.args.get("uni1", "")
     uni2_id_str = request.args.get("uni2", "")
@@ -176,7 +167,6 @@ def compare_page():
                            uni1=uni1, uni2=uni2,
                            uni1_id=uni1_id, uni2_id=uni2_id)
 
-# Add route for adding/removing favorites (Requires POST method and login)
 @app.route("/toggle_favorite/<int:university_id>", methods=["POST"])
 @login_required
 def toggle_favorite(university_id):
@@ -188,14 +178,11 @@ def toggle_favorite(university_id):
         current_user.favorites.append(university)
         flash(f"{university.name} added to favorites.", "success")
     db.session.commit()
-    # Redirect back to the page the user was on, or the university page as fallback
     return redirect(request.referrer or url_for("university_page", university_id=university_id))
 
-
-if __name__ == "__main__":
-    # Create tables if they don't exist (important for first run)
-    with app.app_context():
-        db.create_all()
-    # Note: For deployment, use a production WSGI server like Gunicorn
-    app.run(host="0.0.0.0", port=5002, debug=True)
+# The following block is usually for local development and should be removed or commented out for production deployment
+# if __name__ == "__main__":
+#     with app.app_context():
+#         db.create_all() # Create tables if they don't exist
+#     app.run(host="0.0.0.0", port=5002, debug=True)
 
